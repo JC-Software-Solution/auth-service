@@ -1,6 +1,8 @@
 package jcss.soft.com.auth_service.service;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jcss.soft.com.auth_service.dtos.request.AuthenticateRequest;
 import jcss.soft.com.auth_service.dtos.request.RegisterRequest;
 import jcss.soft.com.auth_service.dtos.response.AuthenticationResponse;
@@ -24,6 +26,7 @@ import static jcss.soft.com.auth_service.constants.Constants.SUCCESS_STATUS;
 
 @Service
 @RequiredArgsConstructor
+
 public class AuthenticationService {
 
     private final UserRepository userRepo;
@@ -36,11 +39,11 @@ public class AuthenticationService {
 
     private final TokenRepository tokenRepo;
 
-    public ResponseObject register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request) {
 
         Optional<User> userRecord = userRepo.findByEmail(request.getEmail());
         if(userRecord.isPresent()) {
-            return new ResponseObject(ERROR_STATUS, "Email already exist", null);
+            return new AuthenticationResponse(false, "Email already exist", null);
         }
         var user = User.builder()
                 .firstname(request.getFirstname())
@@ -56,8 +59,10 @@ public class AuthenticationService {
 
         saveUserToken(savedUser, token);
 
-        var tokenData =  AuthenticationResponse.builder().token(token).build();
-        return new ResponseObject(SUCCESS_STATUS, "You are successfully registered", tokenData);
+        return AuthenticationResponse.builder()
+                .success(true)
+                .message("You are successfully registered")
+                .token(token).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticateRequest request) {
@@ -73,6 +78,8 @@ public class AuthenticationService {
         saveUserToken(user, token);
 
         return AuthenticationResponse.builder()
+                .success(true)
+                .message("You are successfully logged in")
                 .token(token).build();
 
     }

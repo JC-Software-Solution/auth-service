@@ -2,6 +2,7 @@ package jcss.soft.com.auth_service.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jcss.soft.com.auth_service.repository.TokenRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
         }
 
-        jwt = authHeader.substring(7);
+        jwt = extractToken(request);
 
         userEmail = jwtService.extractUsername(jwt);
 
@@ -72,6 +74,23 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies())
+                    .filter(c -> "X-ACCESS-TOKEN".equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        return null;
     }
 
 }
