@@ -11,6 +11,7 @@ import jcss.soft.com.auth_service.repository.UserRepository;
 import jcss.soft.com.auth_service.dtos.response.ResponseObject;
 import jcss.soft.com.auth_service.spel.IUserSpel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
@@ -29,7 +30,8 @@ public class JwtService {
     private final UserRepository userRepository;
     private final ObjectMapper mapper;
 
-    private static final String SECRET_KEY = "566B59703373357638792F423F4528482B4D6251655468576D5A713474377739";
+    @Value("${jwt.secretKey}")
+    private String SECRET_KEY;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

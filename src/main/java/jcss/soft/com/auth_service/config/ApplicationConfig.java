@@ -26,6 +26,7 @@ import java.util.Base64;
 public class ApplicationConfig {
 
     private final UserRepository userRepo;
+
     @Value("${aes.secretKey}")
     private String base64SecretKey;
 
