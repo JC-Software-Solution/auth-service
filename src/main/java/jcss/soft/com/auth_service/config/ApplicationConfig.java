@@ -61,6 +61,4 @@ public class ApplicationConfig {
         byte[] decodedKey = Base64.getDecoder().decode(base64SecretKey);
         return new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
     }
-
-
 }
